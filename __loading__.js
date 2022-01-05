@@ -18,27 +18,6 @@ pc.script.createLoadingScreen(function (app) {
             splash.style.display = 'block';
         };
 
-        var container = document.createElement('div');
-        container.id = 'progress-bar-container';
-        splash.appendChild(container);
-
-        var bar = document.createElement('div');
-        bar.id = 'progress-bar';
-        container.appendChild(bar);
-
-    };
-
-    var hideSplash = function () {
-        var splash = document.getElementById('application-splash-wrapper');
-        splash.parentElement.removeChild(splash);
-    };
-
-    var setProgress = function (value) {
-        var bar = document.getElementById('progress-bar');
-        if (bar) {
-            value = Math.min(1, Math.max(0, value));
-            bar.style.width = value * 100 + '%';
-        }
     };
 
     var createCss = function () {
@@ -66,26 +45,6 @@ pc.script.createLoadingScreen(function (app) {
             '#application-splash img {',
             '    width: 100%;',
             '}',
-
-            '#progress-bar-container {',
-            '    margin: 20px auto 0 auto;',
-            '    height: 2px;',
-            '    width: 100%;',
-            '    background-color: #1d292c;',
-            '}',
-
-            '#progress-bar {',
-            '    width: 0%;',
-            '    height: 100%;',
-            '    background-color: #f60;',
-            '}',
-            '@media (max-width: 480px) {',
-            '    #application-splash {',
-            '        width: 170px;',
-            '        left: calc(50% - 85px);',
-            '    }',
-            '}'
-
         ].join('\n');
 
         var style = document.createElement('style');
@@ -103,10 +62,4 @@ pc.script.createLoadingScreen(function (app) {
     createCss();
 
     showSplash();
-
-    app.on('preload:end', function () {
-        app.off('preload:progress');
-    });
-    app.on('preload:progress', setProgress);
-    app.on('start', hideSplash);
 });
