@@ -1,17 +1,81 @@
 <!doctype html>
 <html>
 <head>
-    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover' />
-    <meta charset='utf-8'>
-    <link rel="stylesheet" type="text/css" href="styles.css">
     <link rel="manifest" href="manifest.json">
-    <style></style>
+    <style>
+        body {
+            margin: 0;
+
+            height: 100vh;
+            width: 100vw;
+
+            display: flex;
+        }
+
+        #canvas {
+            width: 80%;
+            height: 100%;
+        }
+
+        #sidebar {
+            width: 20%;
+            height: 100%;
+        }
+
+        #project-picker {
+            position: relative;
+            z-index: 2;
+            color: white;
+        }
+    </style>
     <title>Template</title>
     <script src="playcanvas-stable.min.js"></script>
     <script src="__settings__.js"></script>
+    <script src="./editor.js"></script>
 </head>
 <body>
-    <script src="__start__.js"></script>
-    <script src="__loading__.js"></script>
+    <canvas id="canvas"></canvas>
+
+    <div id='sidebar'>
+        <h2>Open project</h2>
+        <input id="project-picker" type='file' accept=".json" />
+
+        <h2>Entities</h2>
+        <ul id='entities'></ul>
+    </div>
+
+    <script>
+        const project_picker = document.getElementById("project-picker");
+        project_picker.onchange = (e) => {
+            const canvas = document.getElementById('canvas');
+
+            const app = new pc.Application(canvas, {});
+
+            // fill the available space at full resolution
+            app.setCanvasFillMode(pc.FILLMODE_NONE);
+            app.setCanvasResolution(pc.RESOLUTION_AUTO);
+
+            // ensure canvas is resized when window changes size
+            window.addEventListener('resize', () => app.resizeCanvas());
+
+            const [file] = e.target.files;
+
+            
+            app.loadScene(file.name, () => {
+                app.start();
+                const entity_list = document.getElementById('entities');
+
+                while (entity_list.lastChild) entity_list.lastChild.remove();
+
+                for (let child of app.scene.root.children) {
+                    console.info(child.name)
+                    const entity = document.createElement('li');
+                    entity.innerText = child.name;
+                    entity_list.appendChild(entity);
+                }
+            });
+        };
+
+    </script>
 </body>
 </html>
