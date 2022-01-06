@@ -30,8 +30,6 @@
     </style>
     <title>Template</title>
     <script src="playcanvas-stable.min.js"></script>
-    <script src="__settings__.js"></script>
-    <script src="./editor.js"></script>
 </head>
 <body>
     <canvas id="canvas"></canvas>
@@ -45,36 +43,61 @@
     </div>
 
     <script>
-        const project_picker = document.getElementById("project-picker");
-        project_picker.onchange = (e) => {
-            const canvas = document.getElementById('canvas');
+        // APP
+        const canvas = document.getElementById('canvas');
 
-            const app = new pc.Application(canvas, {});
+        // ensure canvas is resized when window changes size
+        window.addEventListener('resize', () => app.resizeCanvas());
 
-            // fill the available space at full resolution
-            app.setCanvasFillMode(pc.FILLMODE_NONE);
-            app.setCanvasResolution(pc.RESOLUTION_AUTO);
+        const app = new pc.Application(canvas, {
+            mouse: new pc.Mouse(canvas),
+        });
 
-            // ensure canvas is resized when window changes size
-            window.addEventListener('resize', () => app.resizeCanvas());
+        // fill the available space at full resolution
+        app.setCanvasFillMode(pc.FILLMODE_NONE);
+        app.setCanvasResolution(pc.RESOLUTION_AUTO);
 
-            const [file] = e.target.files;
+        // SCRIPT
+        const picker = new pc.Picker(app, canvas.clientWidth, canvas.clientHeight);
 
-            
-            app.loadScene(file.name, () => {
+        const loadProject = (name) => {
+            app.loadScene(name, () => {
                 app.start();
                 const entity_list = document.getElementById('entities');
 
                 while (entity_list.lastChild) entity_list.lastChild.remove();
 
                 for (let child of app.scene.root.children) {
-                    console.info(child.name)
                     const entity = document.createElement('li');
                     entity.innerText = child.name;
                     entity_list.appendChild(entity);
+
+                    // TODO: Should re-prepare whenever active camera in scene changes
+                    if ('camera' in child) {
+                        picker.prepare(child.camera, app.scene);
+                    }
                 }
             });
         };
+
+        const project_picker = document.getElementById("project-picker");
+        project_picker.onchange = (e) => {
+            const [file] = e.target.files;
+
+            loadProject(file.name);
+        };
+
+        loadProject('1305520.json');
+
+        app.mouse.on(pc.EVENT_MOUSEDOWN, (e) => {
+            // console.info(e);
+            const { x, y } = e;
+            const selection = picker.getSelection(x, y);
+            const [mesh] = selection;
+
+            const position = mesh.node.getPosition();
+            console.info('Here is the position of the mesh you clicked: ', position);
+        });
 
     </script>
 </body>
