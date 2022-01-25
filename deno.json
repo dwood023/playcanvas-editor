@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "lib":[
+            "dom",
+            "deno.ns"
+        ]
+    },
+    "fmt": {
+        "options": {
+            "indentWidth": 4
+        }
+    }
+}
